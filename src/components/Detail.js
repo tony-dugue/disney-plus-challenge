@@ -1,20 +1,41 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
 
+// router
+import { useParams } from 'react-router-dom'
+
+// firebase
+import db from '../firebase'
+
 function Detail() {
+
+    const { id } = useParams()  // récupération de l'id dans l'url
+    const [movie, setMovie] = useState()
+
+    useEffect( () => {
+        // Grab the movie info from db
+        db.collection("movies").doc(id)
+            .get()
+            .then( doc => {
+                if(doc.exists) {
+                    setMovie(doc.data())// save the movie data
+                } else {
+                    // redirect to homepage
+                }
+            })
+    }, [])
+
     return (
         <Container>
 
             <Background>
-                <img
-                    src="https://prod-ripcut-delivery.disney-plus.net/v1/variant/disney/4F39B7E16726ECF419DD7C49E011DD95099AA20A962B0B10AA1881A70661CE45/scale?width=1440&aspectRatio=1.78&format=jpeg"/>
+                <img src={movie && movie.backgroundImg} />
             </Background>
 
             {/* logo du film */}
 
             <ImageTitle>
-                <img
-                    src="https://prod-ripcut-delivery.disney-plus.net/v1/variant/disney/D7AEE1F05D10FC37C873176AAA26F777FC1B71E7A6563F36C6B1B497CAB1CEC2/scale?width=1344&aspectRatio=1.78&format=png"/>
+                <img src={movie && movie.titleImg} />
             </ImageTitle>
 
             {/* barre de contrôle (boutons) */}
@@ -41,16 +62,11 @@ function Detail() {
 
             {/* Information du film */}
 
-            <SubTitle>
-                2018 • 7m • Family, Fantasy, Kids, Animation
-            </SubTitle>
+            <SubTitle>{ movie && movie.subTitle}</SubTitle>
 
             {/* Information du film */}
 
-            <Description>
-                A Chinese mom who's sad when her grown son leaves home gets another chance at motherhood
-                when one of her dumplings springs to life. But she finds that nothing stays cute and small forever.
-            </Description>
+            <Description>{movie && movie.description}</Description>
 
         </Container>
     )
